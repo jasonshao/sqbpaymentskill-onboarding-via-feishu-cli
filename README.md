@@ -71,7 +71,8 @@ $ lark-cli im +messages-send --user-id ou_xxx --msg-type interactive \
 └────────────────────────────────────────────────────────────┘
 ```
 
-> 评委想点真实链接看？开发期我用测试主体跑过 1 次完整真链路（已截图但工件已出于隐私销毁）。`git log 0fb95ab..HEAD` 6 个 commit 完整记录了开发→修 schema→真测→修隐私的迭代轨迹。
+> 评委想点真实链接看？开发期我用测试主体跑过 1 次完整真链路（已截图但工件已出于隐私销毁）。
+<img width="438" height="134" alt="Clipboard_Screenshot_1777650733" src="https://github.com/user-attachments/assets/04d271ee-e554-49cc-a1df-b0aa6b19f2b3" />
 
 ---
 

@@ -287,4 +287,3 @@ A：lark-skill-maker 是 lark-cli 的"造 skill 的 skill"。本 skill 是它的
 - 飞书 lark-cli：[larksuite/cli](https://github.com/larksuite/cli)（MIT）
 - 本仓编排：[@jasonshao](https://github.com/jasonshao)
 
-提交至 **飞书 CLI Skill 大赛**（2026-05-05 截止）—— GitHub 赛道。

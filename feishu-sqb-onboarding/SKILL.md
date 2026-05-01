@@ -5,7 +5,6 @@ description: "收钱吧支付接入 onboarding 工作流：基于 6 字段输入
 metadata:
   requires:
     bins: ["lark-cli"]
-    skills: ["WoSai/sqb-payment-skills"]
 tags: [onboarding, payment, shouqianba, sqb, workflow, lark]
 ---
 

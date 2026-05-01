@@ -159,13 +159,16 @@ git submodule update --init --recursive
 ## Step 3 — 创建方案云文档
 
 ```bash
+# 把渲染好的 markdown 写到 cwd 内的相对路径（lark-cli 不接受 /tmp 等绝对路径）
+# 或用 stdin: cat proposal.md | lark-cli docs +create --title "..." --markdown -
 lark-cli docs +create \
   --title "《{{merchant_name}}》收钱吧支付接入方案" \
-  --markdown @/tmp/proposal-{{timestamp}}.md \
-  --format json
+  --markdown ./proposal-{{timestamp}}.md
 ```
 
 **输出捕获**：解析 stdout JSON，取 `data.url` 作为 `doc_url`，`data.document_id` 作为 `doc_id`。
+
+> ⚠️ **路径限制**：`--markdown @<file>` 与 `--content @<file>`、`--file <file>` 都强制相对路径且必须在 cwd 之内（命令本身做 path 校验）。绝对路径如 `/tmp/...` 会被拒。**临时文件先 `cd` 到工作目录或用相对子路径**；agent 实践上推荐 `./` 前缀或纯文件名。
 
 ## Step 4 — 创建 Bitable 与任务行
 
@@ -174,8 +177,7 @@ lark-cli docs +create \
 ```bash
 lark-cli base +base-create \
   --name "《{{merchant_name}}》收钱吧接入" \
-  --time-zone "Asia/Shanghai" \
-  --format json
+  --time-zone "Asia/Shanghai"
 ```
 
 捕获 `data.app.app_token` 作为 `base_token`。
@@ -196,8 +198,7 @@ lark-cli base +table-create \
     {"type":"select","name":"状态","multiple":false,"options":[{"name":"待启动"},{"name":"资料补齐中"},{"name":"联调中"},{"name":"上线"},{"name":"已完成"}]},
     {"type":"text","name":"方案文档","style":{"type":"url"}},
     {"type":"text","name":"代码骨架","style":{"type":"url"}}
-  ]' \
-  --format json
+  ]'
 ```
 
 捕获 `data.table_id` 作为 `main_table_id`。
@@ -290,8 +291,10 @@ sources = [
 ### 5.3 打 zip
 
 ```bash
-zip_path="/tmp/{{merchant_name_slug}}-sqb-{{language}}-{{timestamp}}.zip"
-( cd /tmp/staging-{{timestamp}} && zip -r "$zip_path" . )
+# 必须在 cwd 之内；不要 /tmp 绝对路径，--file 校验会拒
+zip_path="./{{merchant_name_slug}}-sqb-{{language}}-{{timestamp}}.zip"
+staging="./.staging-{{timestamp}}"
+( cd "$staging" && zip -r "../{{merchant_name_slug}}-sqb-{{language}}-{{timestamp}}.zip" . )
 ```
 
 ### 5.4 上传
@@ -299,8 +302,7 @@ zip_path="/tmp/{{merchant_name_slug}}-sqb-{{language}}-{{timestamp}}.zip"
 ```bash
 lark-cli drive +upload \
   --file "$zip_path" \
-  --name "《{{merchant_name}}》收钱吧接入代码骨架.zip" \
-  --format json
+  --name "《{{merchant_name}}》收钱吧接入代码骨架.zip"
 ```
 
 捕获 `data.file_token`，拼出 `zip_url = https://sqb.feishu.cn/file/{{file_token}}`（同 base_url 域名规则）。
@@ -321,12 +323,15 @@ lark-cli base +record-batch-update \
 读 [`./templates/card-dispatch.json.hbs`](./templates/card-dispatch.json.hbs)，渲染产出 interactive card 的 content JSON：
 
 ```bash
+# ⚠️ --content 不支持 @file 也不支持 - stdin；必须 inline JSON。用 shell 命令替换：
 lark-cli im +messages-send \
   --user-id {{owner_open_id}} \
   --msg-type interactive \
-  --content @/tmp/dispatch-card-{{timestamp}}.json \
+  --content "$(cat ./dispatch-card-{{timestamp}}.json)" \
   --idempotency-key "sqb-onboarding-{{merchant_name_slug}}-{{today}}"
 ```
+
+> `--idempotency-key` 透传到请求 body 的 `uuid` 字段；同 key 重发不会再创新消息。
 
 **`--idempotency-key` 必填**：避免重复触发时给 owner 刷屏。
 

@@ -1,0 +1,78 @@
+{{!-- 代码骨架 zip 顶部的 README，由 SKILL.md Step 5.2 渲染。
+     变量与 proposal.md.hbs 共用，多了 zip_path 与 selected_skills_paths。 --}}
+# 《{{merchant_name}}》收钱吧支付接入 — 代码骨架
+
+> 自动生成于 {{today}} ｜ 语言：{{language}} ｜ 涵盖场景：{{scenes_labels_joined}}
+> 上游 SQB 知识源：[WoSai/sqb-payment-skills](https://github.com/WoSai/sqb-payment-skills) (Apache-2.0)
+
+## 这份压缩包里有什么
+
+```
+.
+├── KICKOFF.md                       ← 你正在读
+├── shared-reference/                ← 签名 / 状态判定 / 轮询 / 验签四大共享工具类
+{{#each selected_skills_paths}}├── {{this.skill}}/                       ← {{this.label}}
+│   └── reference/                   ← 该场景的 {{language}} 参考实现
+{{/each}}└── (各 skill 的 SKILL.md 已打包在内，是最权威的接入文档)
+```
+
+## 三步起跑
+
+### 1. 填三个 placeholder（**必须**）
+
+整个骨架里搜以下三个占位符并替换为你的真值：
+
+| 占位符 | 在哪里取 | 备注 |
+|---|---|---|
+| `__SQB_APPID__` | 收钱吧开发者后台 → 应用管理 | 沙箱与生产是不同值 |
+| `__SQB_APPKEY__` | 收钱吧开发者后台 → 应用管理 | **永远不要进 git** |
+| `__SQB_TERMINAL_SN__` / `__SQB_TERMINAL_KEY__` | 走 `sqb-activate` + `sqb-checkin` 两步动态获取 | 后者 24h 轮换 |
+
+> ⚠️ **不要把 `__SQB_APPKEY__` 或 `__SQB_TERMINAL_KEY__` 提交到代码仓**。建议读环境变量或专用 secret 服务。
+
+### 2. 跑共享层（5 分钟）
+
+```{{language_codeblock_lang}}
+{{#if is_java}}
+// Java
+javac shared-reference/SqbSignUtil.java
+// 跑一次签名 self-test
+java -cp shared-reference SqbSignUtil "test_payload" "__SQB_APPKEY__"
+{{else}}
+# Python
+python shared-reference/sqb_sign_util.py
+{{/if}}
+```
+
+预期：输出 32 位小写 hex MD5 字符串。如失败，先排查 key 是否已替换占位符。
+
+### 3. 按场景跑主接口
+
+每个场景目录下都有 `SKILL.md` + `reference/`：
+
+{{#each selected_skills_paths}}
+- **{{this.label}}** → `{{this.skill}}/SKILL.md`、参考实现 `{{this.skill}}/reference/`
+{{/each}}
+
+> 推荐顺序：先 `{{primary_scene_skill}}`（主场景），跑通沙箱再叠加其他。
+
+## 四类共享工具类速查（来自 `shared-reference/`）
+
+| 工具类 | 用途 | 何时引用 |
+|---|---|---|
+| `SqbSignUtil` / `sqb_sign_util.py` | MD5 请求签名 | **所有写接口必须** |
+| `SqbStatusUtil` / `sqb_status_util.py` | 三层状态判定 | 所有支付/退款/查询响应 |
+| `SqbPollingUtil` / `sqb_polling_util.py` | 参数化轮询 | 付款码、预下单查询 |
+| RSA 验签（在 `sqb-callback-verify` 内） | 异步通知验签 | 选了"异步通知"才需要 |
+
+## 接 AI 加速生成
+
+把任意一个 `<skill>/SKILL.md` 喂给 Claude Code、Cursor、Codex，对它说："按 SKILL.md 的分层定位生成 `protocol/` `adapter/` `support/` `bootstrap/` 代码"，10 秒内就有一份分层骨架可跑。
+
+整套立项流程（多维表 + 方案文档 + 本 zip + 任务派发）由 [feishu-sqb-onboarding](https://github.com/jasonshao/sqbpaymentskill-onboarding-via-feishu-cli) 这个 lark-cli skill 自动产出；如需再生成同样形态的接入立项，对你的 AI agent 说"sqb-init"即可。
+
+## 联系
+
+- 对接负责人：{{owner_name}}（已在多维表与 IM 派发卡片里 @ 过）
+- 上游 SKILL 仓 issues：https://github.com/WoSai/sqb-payment-skills/issues
+- 飞书工作台 onboarding 编排 issues：https://github.com/jasonshao/sqbpaymentskill-onboarding-via-feishu-cli/issues

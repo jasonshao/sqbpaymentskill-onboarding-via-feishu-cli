@@ -1,0 +1,28 @@
+{
+  "$comment": "支付场景到 vendor/sqb-payment-skills/sqb-api-skills/<skill> 的映射。SKILL.md 的 Step 1 读这个文件，对用户勾选的 scenes 取 skills 并集，再去取摘要。label 是给中文用户/Bitable 多选选项展示用。",
+  "pay": {
+    "label": "付款码（B 扫 C）",
+    "skills": ["sqb-pay", "sqb-signing", "sqb-status-parsing", "sqb-polling"],
+    "primary_skill": "sqb-pay"
+  },
+  "precreate": {
+    "label": "预下单（C 扫 B）",
+    "skills": ["sqb-precreate", "sqb-query", "sqb-signing", "sqb-status-parsing", "sqb-polling", "sqb-callback-verify"],
+    "primary_skill": "sqb-precreate"
+  },
+  "refund": {
+    "label": "退款",
+    "skills": ["sqb-refund", "sqb-signing", "sqb-status-parsing"],
+    "primary_skill": "sqb-refund"
+  },
+  "activate-checkin": {
+    "label": "终端激活与签到",
+    "skills": ["sqb-activate", "sqb-checkin", "sqb-signing"],
+    "primary_skill": "sqb-activate"
+  },
+  "notify": {
+    "label": "异步通知",
+    "skills": ["sqb-notify", "sqb-callback-verify"],
+    "primary_skill": "sqb-notify"
+  }
+}

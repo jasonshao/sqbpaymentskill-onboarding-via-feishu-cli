@@ -1,0 +1,68 @@
+{{!-- 方案文档模板。SKILL.md Step 2 渲染产物喂给 lark-cli docs +create 的 --markdown。
+     变量见 SKILL.md Step 2 的上下文规约：merchant_name / industry / industry_intro /
+     scenes（数组：{key, label}）/ language / target_launch / today / skill_summaries（数组：{name, description, path}）。
+     模板里的 {{ }} 由调用方（agent）做字符串替换；不依赖任何模板引擎。 --}}
+# 《{{merchant_name}}》收钱吧支付接入方案
+
+> 立项日期：{{today}} ｜ 预计上线：{{target_launch}}
+> 行业：{{industry}} ｜ 开发语言：{{language}}
+> 涵盖场景：{{scenes_labels_joined}}
+>
+> 本方案由 [feishu-sqb-onboarding](https://github.com/jasonshao/sqbpaymentskill-onboarding-via-feishu-cli) 自动生成，知识源自 [WoSai/sqb-payment-skills](https://github.com/WoSai/sqb-payment-skills)（Apache-2.0）。
+
+## 一、行业背景
+
+{{industry_intro}}
+
+## 二、接入范围
+
+本次接入覆盖以下场景与对应的 SQB API skill：
+
+| 场景 | 主接口 SKILL | 配套依赖 SKILL |
+|---|---|---|
+{{#each scenes}}| {{this.label}} | `{{this.primary_skill}}` | {{this.support_skills_joined}} |
+{{/each}}
+
+下方"三、接口清单"列出各 skill 的核心信息；具体调用顺序请参考各 SKILL.md 的"分层定位 / 完整流程"章节。
+
+## 三、接口清单（点开各条进 SKILL.md 看完整规范）
+
+{{#each skill_summaries}}
+### `{{this.name}}`
+
+{{this.description}}
+
+> SKILL.md 路径：[`{{this.path}}`](../{{this.path}})
+
+{{/each}}
+
+## 四、开发节奏建议
+
+| 阶段 | 内容 | 建议工时 |
+|---|---|---|
+| 周 1 | 拉通环境、搞定 `sqb-signing` + `sqb-status-parsing` 两个共享模块 | 1-2 人日 |
+| 周 2 | 按主场景接 1-2 个业务接口（建议 `{{primary_scene_skill}}` 为先），跑沙箱 | 2-3 人日 |
+| 周 3 | 余下业务接口 + 异步通知验签（如涉及） | 2-3 人日 |
+| 周 4 | 端到端联调、压测、上线前演练 | 2 人日 |
+
+> 上线日期：{{target_launch}}（剩 {{days_left}} 天）。如剩余天数 < 14，建议优先保住主场景，把退款/通知等延后。
+
+## 五、配套资产
+
+- **进度表（多维表）**：项目立项时已自动创建，链接见任务派发卡片
+- **代码骨架 zip**：包含本方案勾选场景对应的 `reference/<语言>/` 全部文件 + `KICKOFF.md` 接入指南
+- **共享工具类**：`SqbSignUtil` / `SqbStatusUtil` / `SqbPollingUtil`（位置：`sqb-api-skills/shared-reference/`）
+
+## 六、风险与提醒
+
+1. **签到密钥轮换**：所有写接口必须在每次签到（`sqb-checkin`）后用最新 `key`，否则签名失败。建议在 client 层封装一个 KeyHolder。
+2. **三层状态判定**（详见 `sqb-status-parsing`）：`result_code` → `biz_response.result_code` → `order_status` 三层任一非终态都不能视作成功。**不要只看 HTTP 200**。
+3. **轮询参数化**（详见 `sqb-polling`）：付款类轮询建议初始间隔 2s、衰减系数 1.5、上限 3min；查询类按业务可缩短。
+4. **回调验签**（如选了"异步通知"）：必须 RSA 验签 + 幂等去重。详见 `sqb-callback-verify`。
+5. **沙箱与生产分环境**：在代码骨架 zip 的 `KICKOFF.md` 顶部已留有 `appid` / `key` / `terminal_sn` 三个 placeholder，先填沙箱跑通再切生产。
+
+## 七、对接负责人
+
+@{{owner_name}} 已在进度表"对接登记"主表与"接入任务"子表的负责人字段被分配；同步收到 IM 任务派发卡片。
+
+如需追加场景或调整范围，请直接在进度表里改"支付场景"多选并通知 @{{owner_name}}，本工作流会按需追加任务行（通过 `lark-cli base +record-batch-create`）。

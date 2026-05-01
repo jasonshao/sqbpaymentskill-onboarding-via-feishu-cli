@@ -165,7 +165,7 @@ lark-cli docs +create \
   --markdown ./proposal-{{timestamp}}.md
 ```
 
-**输出捕获**：解析 stdout JSON，取 `data.url` 作为 `doc_url`，`data.document_id` 作为 `doc_id`。
+**输出捕获**：解析 stdout JSON，取 `data.doc_url`（已是完整 URL，例 `https://www.feishu.cn/docx/<id>`）与 `data.doc_id`。
 
 > ⚠️ **路径限制**：`--markdown @<file>` 与 `--content @<file>`、`--file <file>` 都强制相对路径且必须在 cwd 之内（命令本身做 path 校验）。绝对路径如 `/tmp/...` 会被拒。**临时文件先 `cd` 到工作目录或用相对子路径**；agent 实践上推荐 `./` 前缀或纯文件名。
 
@@ -179,7 +179,9 @@ lark-cli base +base-create \
   --time-zone "Asia/Shanghai"
 ```
 
-捕获 `data.app.app_token` 作为 `base_token`。
+捕获 `data.base.base_token` 作为 `base_token`。
+
+> ⚠️ **副作用**：新建 Base 自带一张默认空表"数据表"。本 skill 的工作流不写它；你可以选择忽略（最省事）或调 `lark-cli base +table-delete` 先删掉再走 4.2。**演示场景建议忽略**——默认表存在不影响其他表读写，但加了删除步骤反而让 demo 时序更长。
 
 ### 4.2 创建主表"接入登记"
 
@@ -259,13 +261,15 @@ lark-cli base +record-batch-create \
   }'
 ```
 
-### 4.5 base_url 拼接
+### 4.5 base_url 捕获
+
+`base +base-create` 在 `data.base.url` 已经返回 base_url，**直接用，不要拼**：
 
 ```
-base_url = "https://sqb.feishu.cn/base/{{base_token}}"
+base_url = response.data.base.url   # 例：https://<tenant>.feishu.cn/base/<token>
 ```
 
-（domain 视租户而定；从 `auth status` 输出推不出来时，回落到 `https://feishu.cn/base/<token>`，让用户自己点）
+> 如果该字段为空（少数租户），fallback 用 `https://feishu.cn/base/<token>`，让用户手动点；不要硬编码 `<tenant>.feishu.cn` 域名（仅特定租户成立）。
 
 ## Step 5 — 打包代码骨架并上传
 
@@ -304,7 +308,12 @@ lark-cli drive +upload \
   --name "《{{merchant_name}}》收钱吧接入代码骨架.zip"
 ```
 
-捕获 `data.file_token`，拼出 `zip_url = https://sqb.feishu.cn/file/{{file_token}}`（同 base_url 域名规则）。
+捕获 `data.file_token`。**`drive +upload` 不返回直接可点的 URL**——你有两个选择：
+
+1. **推荐**：再调一次 `lark-cli drive metas batch_query --request-doc-tokens "[{\"doc_token\":\"$file_token\",\"doc_type\":\"file\"}]"`，从返回里取 `url`
+2. 兜底：拼 `https://<tenant>.feishu.cn/file/<file_token>`（域名同 base_url 取出来的 host）；当用户的飞书 SSO 落到对应租户时可点开
+
+写到 `zip_url` 后用于 Step 5.5 回填主行 + Step 6 卡片。
 
 ### 5.5 回填 Bitable 主行的"代码骨架"字段
 

@@ -61,13 +61,14 @@ lark-cli docs +create \
 {
   "ok": true,
   "data": {
-    "url": "https://sqb.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d",
-    "document_id": "Df6Xwvvf1ilk4okJjEPcQHkYn6d"
+    "doc_url": "https://www.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d",
+    "doc_id": "Df6Xwvvf1ilk4okJjEPcQHkYn6d",
+    "message": "文档创建成功"
   }
 }
 ```
 
-→ `doc_url = "https://sqb.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d"`
+→ `doc_url = "https://www.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d"`
 
 ## Step 4 — 创建 Bitable
 
@@ -79,7 +80,7 @@ lark-cli base +base-create \
   --time-zone "Asia/Shanghai"
 ```
 
-→ `base_token = "bscxxxxxxx"`、`base_url = "https://sqb.feishu.cn/base/bscxxxxxxx"`
+→ `base_token = "bscxxxxxxx"`、`base_url = "https://<tenant>.feishu.cn/base/bscxxxxxxx"`
 
 ### 4.2 建主表"接入登记"（9 字段）
 
@@ -100,7 +101,7 @@ lark-cli base +record-batch-create \
       "2026-05-31 00:00:00",
       [{"id":"ou_xxx"}],
       "待启动",
-      "https://sqb.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d",
+      "https://<tenant>.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d",
       null
     ]]
   }'
@@ -175,7 +176,7 @@ lark-cli drive +upload \
   --name "《深圳金店火锅》收钱吧接入代码骨架.zip"
 ```
 
-→ `file_token = "boxcnxxxx"`、`zip_url = "https://sqb.feishu.cn/file/boxcnxxxx"`
+→ `file_token = "boxcnxxxx"`、`zip_url = "https://<tenant>.feishu.cn/file/boxcnxxxx"`
 
 ### 5.5 回填主行
 
@@ -184,7 +185,7 @@ lark-cli base +record-batch-update \
   --base-token bscxxxxxxx --table-id tblABC \
   --json '{
     "record_id_list": ["rec001"],
-    "patch": { "代码骨架": "https://sqb.feishu.cn/file/boxcnxxxx" }
+    "patch": { "代码骨架": "https://<tenant>.feishu.cn/file/boxcnxxxx" }
   }'
 ```
 
@@ -216,9 +217,9 @@ lark-cli im +messages-send \
 
 | 资产 | 链接 |
 |---|---|
-| 方案文档 | https://sqb.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d |
-| 进度表 | https://sqb.feishu.cn/base/bscxxxxxxx |
-| 代码骨架 zip | https://sqb.feishu.cn/file/boxcnxxxx |
+| 方案文档 | https://<tenant>.feishu.cn/docx/Df6Xwvvf1ilk4okJjEPcQHkYn6d |
+| 进度表 | https://<tenant>.feishu.cn/base/bscxxxxxxx |
+| 代码骨架 zip | https://<tenant>.feishu.cn/file/boxcnxxxx |
 | 派发卡片 | 已发给 @张工（消息 id: om_xxxxx）|
 
 涵盖场景：付款码、退款

@@ -18,6 +18,13 @@ out/
 tmp/
 *.zip
 
+# Live-test scratch produced when an agent runs the SKILL.md against
+# a real Feishu tenant (see feishu-sqb-onboarding/SKILL.md Step 5 / 6).
+# These are intermediate render outputs (proposal markdown, card JSON,
+# zip staging) — never to be committed.
+.live-*
+.staging-*
+
 # Python (in case examples generate scratch files)
 __pycache__/
 *.pyc

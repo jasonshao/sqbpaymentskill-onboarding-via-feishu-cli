@@ -1,0 +1,3 @@
+[submodule "vendor/sqb-payment-skills"]
+	path = vendor/sqb-payment-skills
+	url = https://github.com/WoSai/sqb-payment-skills.git

@@ -1,0 +1,28 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+data/tokens.json
+*.pem
+*.key
+
+# Build / runtime artifacts
+dist/
+build/
+out/
+tmp/
+*.zip
+
+# Python (in case examples generate scratch files)
+__pycache__/
+*.pyc
+.venv/
+
+# Node (generated artifacts only — no node_modules expected)
+node_modules/
+*.log

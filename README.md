@@ -71,7 +71,7 @@ $ lark-cli im +messages-send --user-id ou_xxx --msg-type interactive \
 └────────────────────────────────────────────────────────────┘
 ```
 
-> 评委想点真实链接看？开发期我用测试主体跑过 1 次完整真链路（已截图但工件已出于隐私销毁）。
+> 想看真实运行结果？开发期用测试主体跑过 1 次完整真链路，下方截图为当时形态（工件已出于隐私销毁）。
 <img width="415" height="117" alt="Clipboard_Screenshot_1777650780" src="https://github.com/user-attachments/assets/117cb30f-6ca3-4b15-ab5c-5357f75d7049" />
 
 ---
@@ -101,7 +101,7 @@ $ lark-cli im +messages-send --user-id ou_xxx --msg-type interactive \
 
 ---
 
-## 快速上手（评委 3 分钟可复现）
+## 快速上手（3 分钟可复现）
 
 ### 1. 装 lark-cli + 完成认证（一次性）
 
@@ -163,7 +163,7 @@ AI agent (Claude Code / Cursor / Codex) 读 SKILL.md
 
 | 决策 | 选定 | 否决的对面 | 理由 |
 |---|---|---|---|
-| 运行时形态 | **markdown skill**（agent 读 + 调 lark-cli） | 长连接 bot（@larksuiteoapi/node-sdk） | 大赛评分锚点是 lark-cli skill 生态；bot 形态偏离评分点，且要解决公网回调问题（cloudflared/ngrok），demo 脆弱 |
+| 运行时形态 | **markdown skill**（agent 读 + 调 lark-cli） | 长连接 bot（@larksuiteoapi/node-sdk） | 锚定 lark-cli skill 生态；bot 形态需要解决公网回调（cloudflared/ngrok）、断线重连等运维问题，演示脆弱、复现门槛高 |
 | 上游集成 | **submodule pin tag + 零修改** | fork 后改 / 直接 import 包 | submodule 让上游 SKILL.md 路径稳定可引用，pin commit 锁版本；零修改保住 Apache-2.0 派生边界，不与上游争夺更新权 |
 | 场景到 SKILL 映射 | **数据驱动 JSON** ([scene-skill-map.json](feishu-sqb-onboarding/data/scene-skill-map.json)) | 硬编码 if-else | 加场景 / 改依赖时只改 JSON，不动 SKILL.md；同一份数据被 Step 1 解析、Step 2 模板、Step 4 子表行三处复用 |
 | 输入字段数 | **6 个** | 12 个 / 多轮问答 | 6 个 = 方案文档 + Bitable + zip + 派发卡片所需的最小集合；多于 6 个会让 AI 反问回合超过 1 轮，体验变差 |
@@ -272,7 +272,7 @@ A：submodule pin commit 不动，重新 `git submodule update --remote vendor/s
 A：能。把 `vendor/sqb-payment-skills/` 换成你自己的 skill 仓 + 重写 [`scene-skill-map.json`](feishu-sqb-onboarding/data/scene-skill-map.json) + 改 [`industry-copy.json`](feishu-sqb-onboarding/data/industry-copy.json) 与三份模板里的业务话术。SKILL.md 的工作流骨架（6 字段 / Step 1-6 / 错误兜底）可保持不变。
 
 **Q：30 秒是真的吗？**
-A：开发期 1 次完整真测下来 ~18 秒（详 `examples/餐饮-付款码-Java.md` §时间统计）；30 秒是含网络抖动/限流的工程上限。**评委可自己 clone + 跑一次复现**。
+A：开发期 1 次完整真测下来 ~18 秒（详 `examples/餐饮-付款码-Java.md` §时间统计）；30 秒是含网络抖动/限流的工程上限。**clone 后跑一次即可复现**。
 
 **Q：和 [`lark-skill-maker`](https://github.com/larksuite/cli/tree/main/skills/lark-skill-maker) 是什么关系？**
 A：lark-skill-maker 是 lark-cli 的"造 skill 的 skill"。本 skill 是它的下游产物 —— 用 lark-skill-maker 范式造出来的一个 workflow skill。
